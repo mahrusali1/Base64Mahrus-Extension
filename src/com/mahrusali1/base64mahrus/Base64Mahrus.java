@@ -3,7 +3,6 @@ package com.mahrusali1.base64mahrus;
 import com.google.appinventor.components.annotations.*;
 import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.runtime.*;
-import com.google.appinventor.components.runtime.util.Base64Util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,16 +34,14 @@ public class Base64Mahrus extends AndroidNonvisibleComponent {
             fis.close();
             
             if (read > 0) {
-                // Menggunakan Base64Util bawaan AndroidRuntime.jar agar build sukses di GitHub
-                String encodedString = Base64Util.encode(bytes);
+                // Menggunakan DatatypeConverter dari Java standar agar build pasti sukses
+                String encodedString = javax.xml.bind.DatatypeConverter.printBase64Binary(bytes);
                 AfterEncoding(encodedString);
             } else {
                 OnError("File kosong");
             }
-        } catch (IOException e) {
-            OnError("Gagal proses: " + e.getMessage());
         } catch (Exception e) {
-            OnError("Error tidak terduga: " + e.toString());
+            OnError("Gagal proses: " + e.getMessage());
         }
     }
 
