@@ -1,9 +1,9 @@
 package com.mahrusali1.base64mahrus;
 
-import android.util.Base64;
 import com.google.appinventor.components.annotations.*;
 import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.runtime.*;
+import com.google.appinventor.components.runtime.util.Base64Util; // Library internal App Inventor
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -28,12 +28,19 @@ public class Base64Mahrus extends AndroidNonvisibleComponent {
                 OnError("File tidak ditemukan: " + filePath);
                 return;
             }
+            
             FileInputStream fis = new FileInputStream(file);
             byte[] bytes = new byte[(int) file.length()];
-            fis.read(bytes);
+            int read = fis.read(bytes);
             fis.close();
-            String encodedString = Base64.encodeToString(bytes, Base64.NO_WRAP);
-            AfterEncoding(encodedString);
+            
+            if (read > 0) {
+                // Menggunakan Base64Util bawaan App Inventor agar tidak butuh library Android eksternal
+                String encodedString = Base64Util.encode(bytes);
+                AfterEncoding(encodedString);
+            } else {
+                OnError("File kosong");
+            }
         } catch (IOException e) {
             OnError("Gagal proses: " + e.getMessage());
         }
