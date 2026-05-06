@@ -5,13 +5,12 @@ import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.runtime.*;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.lang.reflect.Method;
 
 @DesignerComponent(version = 1,
-    description = "Ekstensi Khusus RHK 7 Bondowoso - Konversi PDF ke Base64",
+    description = "Ekstensi Khusus RHK 7 Bondowoso - Fix Version",
     category = ComponentCategory.EXTENSION,
-    nonVisible = true,
-    iconName = "images/extension.png")
+    nonVisible = true)
 @SimpleObject(external = true)
 public class Base64Mahrus extends AndroidNonvisibleComponent {
 
@@ -19,7 +18,7 @@ public class Base64Mahrus extends AndroidNonvisibleComponent {
         super(container.$form());
     }
 
-    @SimpleFunction(description = "Mengubah file PDF/Gambar menjadi String Base64")
+    @SimpleFunction(description = "Mengubah file menjadi Base64 menggunakan Reflection")
     public void FileToBase64(String filePath) {
         try {
             File file = new File(filePath);
@@ -27,30 +26,31 @@ public class Base64Mahrus extends AndroidNonvisibleComponent {
                 OnError("File tidak ditemukan: " + filePath);
                 return;
             }
-            
+
             FileInputStream fis = new FileInputStream(file);
             byte[] bytes = new byte[(int) file.length()];
-            int read = fis.read(bytes);
+            fis.read(bytes);
             fis.close();
+
+            // Teknik Reflection untuk memanggil Base64 Android tanpa import
+            Class<?> base64Class = Class.forName("android.util.Base64");
+            Method encodeMethod = base64Class.getMethod("encodeToString", byte[].class, int.class);
             
-            if (read > 0) {
-                // Menggunakan DatatypeConverter dari Java standar agar build pasti sukses
-                String encodedString = javax.xml.bind.DatatypeConverter.printBase64Binary(bytes);
-                AfterEncoding(encodedString);
-            } else {
-                OnError("File kosong");
-            }
+            // NO_WRAP = 2 (agar string tidak terpotong baris baru)
+            String encodedString = (String) encodeMethod.invoke(null, bytes, 2);
+
+            AfterEncoding(encodedString);
         } catch (Exception e) {
-            OnError("Gagal proses: " + e.getMessage());
+            OnError("Gagal: " + e.toString());
         }
     }
 
-    @SimpleEvent(description = "Hasil konversi Base64")
+    @SimpleEvent
     public void AfterEncoding(String base64String) {
         EventDispatcher.dispatchEvent(this, "AfterEncoding", base64String);
     }
 
-    @SimpleEvent(description = "Terjadi kesalahan")
+    @SimpleEvent
     public void OnError(String message) {
         EventDispatcher.dispatchEvent(this, "OnError", message);
     }
