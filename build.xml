@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project name="" default="all">
+<project name="Base64Mahrus" default="all">
 
   <property name="Extensions.dir" location="out" />
   <property name="AndroidRuntime-classes.dir" location="build/classes"/>
@@ -28,7 +28,7 @@
     <javac target="7" source="7" destdir="${AndroidRuntime-classes.dir}" srcdir="src" encoding="utf-8"
            includeantruntime="false">
       <classpath>
-        <fileset dir="lib/appinventor">
+        <fileset dir="lib/appinventornew">
           <include name="*.jar" />
         </fileset>
         <fileset dir="lib/deps">
@@ -48,7 +48,7 @@
     <javac target="7" source="7" destdir="${AndroidRuntime-classes.dir}" srcdir="src" encoding="utf-8"
            includeantruntime="false">
       <classpath>
-        <fileset dir="lib/appinventor">
+        <fileset dir="lib/appinventornew">
           <include name="*.jar" />
         </fileset>
         <fileset dir="lib/deps">
@@ -66,7 +66,7 @@
     <mkdir dir="${ExternalComponent-class.dir}" />
     <java failonerror="true" classname="com.google.appinventor.components.scripts.ExternalComponentGenerator">
       <classpath>
-        <pathelement location="lib/appinventor/AnnotationProcessors.jar" />
+        <pathelement location="lib/appinventornew/AnnotationProcessors.jar" />
       </classpath>
       <arg path="${AndroidRuntime-classes.dir}/simple_components.json" />
       <arg path="${AndroidRuntime-classes.dir}/simple_components_build_info.json" />
@@ -78,9 +78,6 @@
     </java>
   </target>
 
-  <!-- =====================================================================
-      unjarAllExtensionLibraries : Unjarring extension's library in order for the extensions'dex to work properly.
-      ===================================================================== -->
   <target name="unjarAllExtensionLibraries">
     <foreach target="unjarExtensionLibraries" param="extension" inheritall="true">
       <path>
@@ -100,9 +97,6 @@
     </unzip>
   </target>
 
-  <!-- =====================================================================
-     jarAllExtensions: create ${extension}.jar and AndroidRuntime.jar for each extension.
-     ===================================================================== -->
   <target name="jarAllExtensions" depends="process,unjarAllExtensionLibraries" >
     <foreach target="jarExtension" param="extension" inheritall="true">
       <path>
@@ -127,9 +121,6 @@
     <echo>Generated build file AndroidRuntime.jar [${extensionClassFolder}]</echo>
   </target>
 
-  <!-- =====================================================================
-       dexAllExtensions: create classes.dex for each extension.
-       ===================================================================== -->
   <target name="dexAllExtensions" depends="jarAllExtensions">
     <foreach target="dexExtension" param="extension">
       <path>
@@ -142,7 +133,7 @@
 
   <target name="dexExtension" depends="">
     <basename property="extensionType" file="${extension}" suffix=".jar"/>
-    <java jar="lib/appinventor/dx.jar"
+    <java jar="lib/appinventornew/dx.jar"
           fork="true"
           failonerror="true">
       <arg value="--dex"/>
@@ -154,11 +145,6 @@
     <echo>Dexing extension: ${extensionType}</echo>
   </target>
 
-
-
-  <!-- =====================================================================
-      extensions: create ${extension}.aix for each external component.
-       ===================================================================== -->
   <target name="packExtension">
     <basename property="extensionType" file="${extension}" />
     <zip destfile="${Extensions.dir}/${extensionType}.aix"
@@ -177,12 +163,6 @@
       </path>
     </foreach>
   </target>
-
-  <!-- =====================================================================
-       ProGuard: obfuscates and minifies the AndroidRuntime.jar file, containing
-       the extensions source code. Only runs if the task has been called
-       like "ant extensions -Dproguard=1".
-       ===================================================================== -->
 
   <condition property="skipProguard">
     <not>
