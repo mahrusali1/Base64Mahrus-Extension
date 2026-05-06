@@ -3,10 +3,7 @@ package com.mahrusali1.base64mahrus;
 import com.google.appinventor.components.annotations.*;
 import com.google.appinventor.components.common.ComponentCategory;
 import com.google.appinventor.components.runtime.*;
-// Impor eksplisit untuk utilitas
 import com.google.appinventor.components.runtime.util.Base64Util;
-import com.google.appinventor.components.runtime.EventDispatcher;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,24 +35,26 @@ public class Base64Mahrus extends AndroidNonvisibleComponent {
             fis.close();
             
             if (read > 0) {
-                // Menggunakan jalur lengkap agar compiler tidak bingung
-                String encodedString = com.google.appinventor.components.runtime.util.Base64Util.encode(bytes);
+                // Menggunakan Base64Util bawaan AndroidRuntime.jar agar build sukses di GitHub
+                String encodedString = Base64Util.encode(bytes);
                 AfterEncoding(encodedString);
             } else {
                 OnError("File kosong");
             }
         } catch (IOException e) {
             OnError("Gagal proses: " + e.getMessage());
+        } catch (Exception e) {
+            OnError("Error tidak terduga: " + e.toString());
         }
     }
 
     @SimpleEvent(description = "Hasil konversi Base64")
-    public void AfterEncoding(final String base64String) {
-        com.google.appinventor.components.runtime.EventDispatcher.dispatchEvent(this, "AfterEncoding", base64String);
+    public void AfterEncoding(String base64String) {
+        EventDispatcher.dispatchEvent(this, "AfterEncoding", base64String);
     }
 
     @SimpleEvent(description = "Terjadi kesalahan")
-    public void OnError(final String message) {
-        com.google.appinventor.components.runtime.EventDispatcher.dispatchEvent(this, "OnError", message);
+    public void OnError(String message) {
+        EventDispatcher.dispatchEvent(this, "OnError", message);
     }
 }
