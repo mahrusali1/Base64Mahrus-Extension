@@ -25,7 +25,8 @@ jobs:
       run: ant extensions
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Base64Mahrus-AIX
         path: out/*.aix
+        if-no-files-found: error
